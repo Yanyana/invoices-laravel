@@ -51,11 +51,7 @@
             <div class="col-4">
               <div class="form-group">
                 <select class="form-control">
-                <option>option 1</option>
-                <option>option 2</option>
-                <option>option 3</option>
-                <option>option 4</option>
-                <option>option 5</option>
+                  <option>AMI</option>
                 </select>
               </div>
             </div>
@@ -110,7 +106,7 @@
       Tambah barang
     </button>
     </div>
-    <table class="table table-bordered table-invoice">
+    <table id="invoice-table" class="table table-bordered table-invoice">
       <thead>
         <tr>
           <th style="width: 120px">Item</th>
@@ -154,7 +150,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <table class="table table-bordered">
+        <table id="list-barang" class="table table-bordered">
           <thead>
             <tr>
               <td>
@@ -231,16 +227,29 @@
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script>
     $(document).ready(function(){
-        $(".add-item").on('click', function () {
-          var currentRow = $(this).closest("tr");
-          var kode_brg=currentRow.find("td:eq(0)").text()
-          var nama=currentRow.find("td:eq(1)").text()
-          var satuan=currentRow.find("td:eq(2)").text()
-          var hbeli=currentRow.find("td:eq(3)").text()
-          var stock=currentRow.find("td:eq(4)").text()
-          var markup = "<tr><td>"+ kode_brg +"</td><td>" + nama + "</td><td>" + satuan + "</td><td><input type='number' name='qty_pesan' value='0'></td><td>" + hbeli + "</td><td>" + 0 + "</td><td><input type='number' name='amount' value='0' disabled></td></tr>";
-          $(".table-invoice").append(markup);
-        })
+      $(".add-item").on('click', function () {
+        var currentRow = $(this).closest("tr");
+        var kode_brg=currentRow.find("td:eq(0)").text()
+        var nama=currentRow.find("td:eq(1)").text()
+        var satuan=currentRow.find("td:eq(2)").text()
+        var hbeli=parseFloat(currentRow.find("td:eq(3)").text())
+        var stock=currentRow.find("td:eq(4)").text()
+        var markup = "<tr><td>"+ kode_brg +"</td><td>" + nama + "</td><td>" + satuan + "</td><td><input class='form-control input-qty' type='number' name='qty_pesan' value='0'></td><td><input class='form-control input-price' type='number' name='qty_pesan' value='"+ hbeli +"' disabled></td><td>" + 0 + "</td><td><input class='form-control input-amount' type='number' name='amount' value='0' disabled></td></tr>";
+        $(".table-invoice").append(markup);
+      })
+
+      $("#list-barang").on('click','.add-item',function(){
+        $(this).parent().parent().remove();
+      });
+
+      // Calculate total when input fields are changed
+      $('#invoice-table tbody').on('keyup', 'tr input', function() {
+        var row = $(this).closest('tr');
+        var quantity = parseFloat(row.find('.input-qty').val());
+        var price = parseFloat(row.find('.input-price').val());
+        var total = !!price ? (price * quantity) : 0;
+        row.find('.input-amount').val(total.toFixed(2));
+      });
     });
   </script>
 @stop
